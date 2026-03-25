@@ -1,3 +1,56 @@
+전체 테이블 목록
+```sql
+select table_schema, table_name
+from information_schema.tables
+where table_schema = 'app'
+  and table_type = 'BASE TABLE'
+order by table_name;
+```
+
+- `app.companies`: 회사 기본 정보
+- `app.billing_usage_daily`: 일별 저장량 스냅샷(월평균/월추이)
+- `app.backup_throughput`: 분 단위 업로드 집계(연간 활동)
+- `app.backup_logs`: 업로드/삭제/복구/설정변경 로그(일별 활동)
+- `app.notification_events`: 설정변경 이벤트 보강 로그
+- `app.file_events`: 파일 업로드 원본 이벤트(성공률/속도/호스트 사용량)
+- `app.deleted_objects`: 삭제 처리된 파일 키
+- `app.host_metrics`: CPU/메모리/네트워크 지표
+
+각 테이블 데이터 확인 (공통 템플릿)
+아래에서 `app.테이블명`만 바꿔 실행:
+
+```sql
+select *
+from app.테이블명
+limit 200;
+```
+
+회사별 데이터 확인 (공통 템플릿)
+`company_id` 컬럼이 있는 테이블에서 사용:
+
+```sql
+select *
+from app.테이블명
+where company_id = :company_id
+limit 2000;
+```
+
+파일 데이터 테이블 확인
+```sql
+select *
+from app.file_events
+where company_id = :company_id
+order by uploaded_at desc
+limit 5000;
+```
+
+```sql
+select *
+from app.deleted_objects
+where company_id = :company_id
+order by deleted_at desc
+limit 5000;
+```
 
 
 `":company_id"`는 실제 회사 ID로 바꿔서 실행합니다.
